@@ -15,5 +15,6 @@ public class App {
 
     var reports = Reports.of("src/main/resources/day2.txt");
     System.out.println("Number of safe reports : " + reports.countSafeReports());
+    System.out.println("Number of Problem Dampener safe reports : " + reports.countProblemDampenerSafeReports());
   }
 }

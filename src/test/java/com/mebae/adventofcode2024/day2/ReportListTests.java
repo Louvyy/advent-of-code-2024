@@ -16,7 +16,12 @@ class ReportListTests {
   }
 
   @Test
-  void computeTotalDistanceTest() {
+  void countSafeReportsTest() {
     assertEquals(2, reportList.countSafeReports());
+  }
+
+  @Test
+  void countProblemDampenerSafeReportsTest() {
+    assertEquals(4, reportList.countProblemDampenerSafeReports());
   }
 }

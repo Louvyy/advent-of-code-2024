@@ -41,13 +41,20 @@ public class Reports {
    * A report is safe if :
    * - The levels are either all strictly increasing or all strictly decreasing.
    * - Any two adjacent levels differ by at least one and at most three.
+   *
    * @return the number of safe reports
    */
   public long countSafeReports() {
-    return reports.stream()
-      .map(Report::isSafeReport)
-      .filter(isSafe -> isSafe)
-      .count();
+    return reports.stream().map(Report::isReportSafe).filter(isSafe -> isSafe).count();
+  }
+
+  /**
+   * A report is Problem Dampener safe if removing a single level from an unsafe report would make it safe.
+   *
+   * @return the number of Problem Dampener safe reports
+   */
+  public long countProblemDampenerSafeReports() {
+    return reports.stream().map(Report::isReportProblemDampenerSafe).filter(isSafe -> isSafe).count();
   }
 
   private static class Report {
@@ -61,21 +68,42 @@ public class Reports {
      * A report is safe if :
      * - The levels are either all strictly increasing or all strictly decreasing.
      * - Any two adjacent levels differ by at least one and at most three.
+     *
      * @return true if the report is safe
      */
-    private boolean isSafeReport() {
+    private static boolean isReportSafe(List<Integer> levels) {
       if (levels.size() < 2) {
         return true;
       }
       var isIncreasingList = levels.get(0) < levels.get(1);
-      return IntStream.range(0, levels.size() - 1)
-        .allMatch(i -> {
-          var currentLevel = levels.get(i);
-          var nextLevel = levels.get(i + 1);
-          return isIncreasingList
-            ? nextLevel >= currentLevel + 1 && nextLevel <= currentLevel + 3
-            : nextLevel <= currentLevel - 1 && nextLevel >= currentLevel - 3;
-        });
+      return IntStream.range(0, levels.size() - 1).allMatch(i -> {
+        var currentLevel = levels.get(i);
+        var nextLevel = levels.get(i + 1);
+        return isIncreasingList
+          ? nextLevel >= currentLevel + 1 && nextLevel <= currentLevel + 3
+          : nextLevel <= currentLevel - 1 && nextLevel >= currentLevel - 3;
+      });
+    }
+
+    private boolean isReportSafe() {
+      return isReportSafe(levels);
+    }
+
+    /**
+     * A report is Problem Dampener safe if removing a single level from an unsafe report would make it safe.
+     *
+     * @return true if the report is Problem Dampener safe
+     */
+    private boolean isReportProblemDampenerSafe() {
+      if (isReportSafe()) {
+        return true;
+      }
+
+      return IntStream.range(0, levels.size()).anyMatch(i -> {
+        var dampenerSafeLevels = new ArrayList<>(levels);
+        dampenerSafeLevels.remove(i);
+        return isReportSafe(dampenerSafeLevels);
+      });
     }
   }
 }
