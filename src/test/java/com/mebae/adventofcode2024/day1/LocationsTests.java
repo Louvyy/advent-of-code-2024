@@ -1,6 +1,5 @@
-package com.mebae.adventofcode2024;
+package com.mebae.adventofcode2024.day1;
 
-import com.mebae.adventofcode2024.day1.Locations;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

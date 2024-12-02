@@ -1,6 +1,7 @@
 package com.mebae.adventofcode2024;
 
 import com.mebae.adventofcode2024.day1.Locations;
+import com.mebae.adventofcode2024.day2.Reports;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
@@ -11,5 +12,8 @@ public class App {
     var locations = Locations.of("src/main/resources/day1.txt");
     System.out.println("Total distance : " + locations.computeTotalDistance());
     System.out.println("Similarity score : " + locations.computeSimilarityScore());
+
+    var reports = Reports.of("src/main/resources/day2.txt");
+    System.out.println("Number of safe reports : " + reports.countSafeReports());
   }
 }
