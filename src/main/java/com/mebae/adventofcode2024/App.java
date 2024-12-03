@@ -20,5 +20,6 @@ public class App {
 
     var memory = Memory.of("src/main/resources/day3.txt");
     System.out.println("Multiplications result : " + memory.computeMulResult());
+    System.out.println("Multiplications with instructions result : " + memory.computeMulWithInstructionsResult());
   }
 }

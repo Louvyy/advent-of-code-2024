@@ -19,4 +19,9 @@ class MemoryTests {
   void computeMulResultTest() {
     assertEquals(161, memory.computeMulResult());
   }
+
+  @Test
+  void computeMulWithInstructionsResultTest() {
+    assertEquals(48, memory.computeMulWithInstructionsResult());
+  }
 }
