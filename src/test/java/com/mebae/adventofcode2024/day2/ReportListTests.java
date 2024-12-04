@@ -17,11 +17,11 @@ class ReportListTests {
 
   @Test
   void countSafeReportsTest() {
-    assertEquals(2, reportList.countSafeReports());
+    assertEquals(2, reportList.countSafe());
   }
 
   @Test
   void countProblemDampenerSafeReportsTest() {
-    assertEquals(4, reportList.countProblemDampenerSafeReports());
+    assertEquals(4, reportList.countProblemDampenerSafe());
   }
 }

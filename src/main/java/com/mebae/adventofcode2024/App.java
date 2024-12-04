@@ -15,8 +15,8 @@ public class App {
     System.out.println("Similarity score : " + locations.computeSimilarityScore());
 
     var reports = Reports.of("src/main/resources/day2.txt");
-    System.out.println("Number of safe reports : " + reports.countSafeReports());
-    System.out.println("Number of Problem Dampener safe reports : " + reports.countProblemDampenerSafeReports());
+    System.out.println("Number of safe reports : " + reports.countSafe());
+    System.out.println("Number of Problem Dampener safe reports : " + reports.countProblemDampenerSafe());
 
     var memory = Memory.of("src/main/resources/day3.txt");
     System.out.println("Multiplications result : " + memory.computeMulResult());
