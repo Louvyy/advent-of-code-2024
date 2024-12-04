@@ -1,15 +1,27 @@
 package com.mebae.adventofcode2024.day3;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static com.mebae.adventofcode2024.utils.FileUtils.readString;
+
 public class Memory {
   private final String corruptedMemory;
-  private int mulResult = -1;
-  private int mulWithInstructionsResult = -1;
+  private Integer mulResult = null;
+  private Integer mulWithInstructionsResult = null;
+
+  /**
+   * Regex pattern to match a mul() operation with two numeric arguments
+   */
+  private static final String MUL_OPERATION_REGEX = "mul\\((\\d+),(\\d+)\\)";
+
+  /**
+   * Regex pattern to match either a mul() operation or conditional statements (do() and don't())
+   */
+  private static final String MUL_AND_INSTRUCTION_REGEX = MUL_OPERATION_REGEX + "|do\\(\\)|don't\\(\\)";
+
+  private static final String ENABLE_INSTRUCTION = "do()";
+  private static final String DISABLE_INSTRUCTION = "don't()";
 
   private Memory(String corruptedMemory) {
     this.corruptedMemory = corruptedMemory;
@@ -17,20 +29,12 @@ public class Memory {
 
   public static Memory of(String fileName) {
     Objects.requireNonNull(fileName);
-    return new Memory(readCorruptedMemory(fileName));
-  }
-
-  private static String readCorruptedMemory(String fileName) {
-    try {
-      return Files.readString(Path.of(fileName));
-    } catch (IOException e) {
-      throw new IllegalArgumentException("An error occurred while reading the file: " + e.getMessage());
-    }
+    return new Memory(readString(fileName));
   }
 
   public int computeMulResult() {
-    if (mulResult == -1) {
-      var pattern = Pattern.compile("mul\\((\\d+),(\\d+)\\)");
+    if (mulResult == null) {
+      var pattern = Pattern.compile(MUL_OPERATION_REGEX);
       var matcher = pattern.matcher(corruptedMemory);
       mulResult = 0;
       while (matcher.find()) {
@@ -41,21 +45,21 @@ public class Memory {
   }
 
   public int computeMulWithInstructionsResult() {
-    if (mulWithInstructionsResult == -1) {
-      var pattern = Pattern.compile("mul\\((\\d+),(\\d+)\\)|do\\(\\)|don't\\(\\)");
+    if (mulWithInstructionsResult == null) {
+      var pattern = Pattern.compile(MUL_AND_INSTRUCTION_REGEX);
       var matcher = pattern.matcher(corruptedMemory);
       mulWithInstructionsResult = 0;
       var enabled = true;
       while (matcher.find()) {
         var match = matcher.group();
-        if (match.equals("don't()")) {
-          enabled = false;
-        }
-        else if (match.equals("do()")) {
-          enabled = true;
-        }
-        else if (enabled) {
-          mulWithInstructionsResult += Integer.parseInt(matcher.group(1)) * Integer.parseInt(matcher.group(2));
+        switch (match) {
+          case ENABLE_INSTRUCTION -> enabled = true;
+          case DISABLE_INSTRUCTION -> enabled = false;
+          default -> {
+            if (enabled) {
+              mulWithInstructionsResult += Integer.parseInt(matcher.group(1)) * Integer.parseInt(matcher.group(2));
+            }
+          }
         }
       }
     }

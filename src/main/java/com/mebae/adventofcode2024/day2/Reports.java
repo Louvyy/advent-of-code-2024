@@ -1,15 +1,17 @@
 package com.mebae.adventofcode2024.day2;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.mebae.adventofcode2024.utils.FileUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
+
+import static com.mebae.adventofcode2024.utils.NumberUtils.isStrictlyOrdered;
+import static com.mebae.adventofcode2024.utils.constants.RegexConstants.WHITESPACE_SPLITTER;
 
 public class Reports {
 
@@ -21,20 +23,17 @@ public class Reports {
 
   public static Reports of(String fileName) {
     Objects.requireNonNull(fileName);
-    return readReportsFile(fileName);
-  }
 
-  private static Reports readReportsFile(String fileName) {
-    try (Stream<String> lines = Files.lines(Path.of(fileName))) {
-      var reports = new ArrayList<Report>();
-      lines.forEach(line -> {
-        var levels = line.split("\\s+");
-        reports.add(new Report(Arrays.stream(levels).mapToInt(Integer::parseInt).boxed().collect(Collectors.toList())));
-      });
-      return new Reports(reports);
-    } catch (IOException e) {
-      throw new IllegalArgumentException("An error occurred while reading the file: " + e.getMessage());
-    }
+    var reports = new ArrayList<Report>();
+
+    Consumer<String> fillReports = line -> {
+      var levels = line.split(WHITESPACE_SPLITTER);
+      reports.add(new Report(Arrays.stream(levels).mapToInt(Integer::parseInt).boxed().collect(Collectors.toList())));
+    };
+
+    FileUtils.computeForEachLine(fileName, fillReports);
+
+    return new Reports(reports);
   }
 
   /**
@@ -44,8 +43,8 @@ public class Reports {
    *
    * @return the number of safe reports
    */
-  public long countSafeReports() {
-    return reports.stream().map(Report::isReportSafe).filter(isSafe -> isSafe).count();
+  public long countSafe() {
+    return reports.stream().map(Report::isSafe).filter(isSafe -> isSafe).count();
   }
 
   /**
@@ -53,8 +52,8 @@ public class Reports {
    *
    * @return the number of Problem Dampener safe reports
    */
-  public long countProblemDampenerSafeReports() {
-    return reports.stream().map(Report::isReportProblemDampenerSafe).filter(isSafe -> isSafe).count();
+  public long countProblemDampenerSafe() {
+    return reports.stream().map(Report::isProblemDampenerSafe).filter(isSafe -> isSafe).count();
   }
 
   private static class Report {
@@ -71,7 +70,7 @@ public class Reports {
      *
      * @return true if the report is safe
      */
-    private static boolean isReportSafe(List<Integer> levels) {
+    private static boolean isSafe(List<Integer> levels) {
       if (levels.size() < 2) {
         return true;
       }
@@ -79,14 +78,14 @@ public class Reports {
       return IntStream.range(0, levels.size() - 1).allMatch(i -> {
         var currentLevel = levels.get(i);
         var nextLevel = levels.get(i + 1);
-        return isIncreasingList
-          ? nextLevel >= currentLevel + 1 && nextLevel <= currentLevel + 3
-          : nextLevel <= currentLevel - 1 && nextLevel >= currentLevel - 3;
+        return isStrictlyOrdered(isIncreasingList, currentLevel, nextLevel)
+          && Math.abs(nextLevel - currentLevel) >= 1
+          && Math.abs(nextLevel - currentLevel) <= 3;
       });
     }
 
-    private boolean isReportSafe() {
-      return isReportSafe(levels);
+    private boolean isSafe() {
+      return isSafe(levels);
     }
 
     /**
@@ -94,15 +93,15 @@ public class Reports {
      *
      * @return true if the report is Problem Dampener safe
      */
-    private boolean isReportProblemDampenerSafe() {
-      if (isReportSafe()) {
+    private boolean isProblemDampenerSafe() {
+      if (isSafe()) {
         return true;
       }
 
       return IntStream.range(0, levels.size()).anyMatch(i -> {
         var dampenerSafeLevels = new ArrayList<>(levels);
         dampenerSafeLevels.remove(i);
-        return isReportSafe(dampenerSafeLevels);
+        return isSafe(dampenerSafeLevels);
       });
     }
   }
